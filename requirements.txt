@@ -1,0 +1,5 @@
+google-genai
+requests
+python_docx
+flask
+docx2pdf

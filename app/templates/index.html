@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Resume Parser</title>
+		<!-- Bootstrap CSS -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Font Awesome for icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<style>
+			body {
+				background-color: #f8f9fa;
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			}
+			.resume-container {
+				max-width: 900px;
+				margin: 30px auto;
+				padding: 30px;
+				background-color: #fff;
+				border-radius: 10px;
+				box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 25px;
+				padding-bottom: 15px;
+				border-bottom: 2px solid #f0f0f0;
+			}
+			.header h1 {
+				color: #2c3e50;
+				font-weight: 600;
+			}
+			.header p {
+				color: #7f8c8d;
+				font-size: 1.1rem;
+			}
+			textarea {
+				resize: vertical;
+				min-height: 300px;
+				font-family: "Courier New", Courier, monospace;
+				font-size: 14px;
+				line-height: 1.5;
+			}
+			.btn-primary {
+				background-color: #3498db;
+				border-color: #3498db;
+				padding: 10px 24px;
+				font-weight: 600;
+				transition: all 0.3s;
+			}
+			.btn-primary:hover {
+				background-color: #2980b9;
+				border-color: #2980b9;
+				transform: translateY(-2px);
+			}
+			.form-label {
+				font-weight: 600;
+				color: #34495e;
+			}
+			.features {
+				margin: 20px 0;
+				padding: 15px;
+				background-color: #f5f7fa;
+				border-radius: 8px;
+			}
+			.feature-item {
+				display: flex;
+				align-items: center;
+				margin-bottom: 12px;
+			}
+			.feature-item i {
+				color: #27ae60;
+				margin-right: 10px;
+				font-size: 18px;
+			}
+			.alert {
+				display: none;
+				margin-top: 20px;
+			}
+			.spinner-border {
+				display: none;
+				margin-right: 10px;
+			}
+			#resultArea {
+				display: none;
+				margin-top: 20px;
+				padding: 15px;
+				background-color: #eafaf1;
+				border-radius: 8px;
+				border-left: 4px solid #2ecc71;
+			}
+			.tips {
+				margin-top: 20px;
+				font-size: 0.9rem;
+				color: #7f8c8d;
+			}
+
+			/* Resume Preview styles */
+			.preview-container {
+				display: none;
+				margin-top: 30px;
+				padding: 20px;
+				border: 1px solid #e0e0e0;
+				background-color: white;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				font-size: 10pt;
+				line-height: 1.4;
+			}
+			.preview-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 15px;
+			}
+			.preview-title {
+				color: #2c3e50;
+				font-weight: bold;
+				margin-bottom: 15px;
+				padding-bottom: 5px;
+				border-bottom: 1px solid #eee;
+			}
+			.preview-contact {
+				text-align: center;
+				margin-bottom: 15px;
+			}
+			.preview-contact .name {
+				font-weight: bold;
+				font-size: 14pt;
+				margin-bottom: 5px;
+			}
+			.preview-contact .links a {
+				color: #3498db;
+				text-decoration: underline;
+			}
+			.preview-contact .title {
+				font-weight: bold;
+				text-decoration: underline;
+				margin-top: 5px;
+			}
+			.preview-section {
+				margin-top: 15px;
+			}
+			.preview-section h3 {
+				font-weight: bold;
+				font-size: 11pt;
+				margin-bottom: 8px;
+			}
+			.skills-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 15px;
+			}
+			.skills-table th,
+			.skills-table td {
+				border: 1px solid #ddd;
+				padding: 8px;
+			}
+			.skills-table th {
+				background-color: #f9f9f9;
+				font-weight: bold;
+				text-align: center;
+			}
+			.company-role {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 5px;
+			}
+			.company {
+				font-weight: bold;
+				font-style: italic;
+			}
+			.location {
+				font-weight: bold;
+				font-style: italic;
+			}
+			.role {
+				font-style: italic;
+			}
+			.dates {
+				font-style: italic;
+			}
+			.achievements {
+				margin-left: 20px;
+				margin-bottom: 15px;
+			}
+			.achievements li {
+				margin-bottom: 3px;
+			}
+			.preview-controls {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 20px;
+				padding-top: 15px;
+				border-top: 1px solid #eee;
+			}
+
+			/* Editable elements styling */
+			[contenteditable] {
+				padding: 2px 4px;
+				border: 1px solid transparent;
+				border-radius: 3px;
+				transition: all 0.2s;
+			}
+			[contenteditable]:hover {
+				border: 1px dashed #ccc;
+				background-color: #f9f9ff;
+			}
+			[contenteditable]:focus {
+				outline: none;
+				border: 1px solid #3498db;
+				background-color: #f0f8ff;
+			}
+			.editable-note {
+				background-color: #fff8e1;
+				border-left: 3px solid #ffb300;
+				padding: 8px 12px;
+				margin: 10px 0;
+				font-size: 0.9rem;
+				display: flex;
+				align-items: center;
+			}
+			.editable-note i {
+				margin-right: 8px;
+				color: #ffb300;
+			}
+			.edit-label {
+				position: absolute;
+				top: -20px;
+				right: 0;
+				font-size: 10px;
+				color: #3498db;
+				background-color: #f0f8ff;
+				padding: 2px 5px;
+				border-radius: 3px;
+				display: none;
+			}
+			.editable-container {
+				position: relative;
+			}
+			.editable-container:hover .edit-label {
+				display: block;
+			}
+			.achievement-controls {
+				margin: 10px 0;
+			}
+			.add-achievement-btn {
+				color: #27ae60;
+				cursor: pointer;
+			}
+			.delete-achievement-btn {
+				color: #e74c3c;
+				cursor: pointer;
+				margin-left: 5px;
+				display: inline-block;
+			}
+			#downloadSpinner {
+				display: none;
+				width: 1rem;
+				height: 1rem;
+				margin-right: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container resume-container">
+			<div class="header">
+				<h1><i class="fas fa-file-alt me-2"></i>Resume Parser</h1>
+				<p>
+					Transform your plain text resume into a professionally formatted
+					document
+				</p>
+			</div>
+
+			<form id="resumeForm">
+				<div class="mb-4">
+					<label for="resume" class="form-label"
+						>Paste your resume text below:</label
+					>
+					<textarea
+						id="resume"
+						name="resume"
+						class="form-control"
+						rows="15"
+						required
+						placeholder="Paste your full resume text here..."
+					></textarea>
+				</div>
+
+				<div class="features">
+					<h5>What this tool does:</h5>
+					<div class="feature-item">
+						<i class="fas fa-check-circle"></i>
+						<span>Creates a professionally formatted Word document</span>
+					</div>
+					<div class="feature-item">
+						<i class="fas fa-check-circle"></i>
+						<span>Structures your resume into proper sections</span>
+					</div>
+					<div class="feature-item">
+						<i class="fas fa-check-circle"></i>
+						<span>Adds clickable links for email and LinkedIn</span>
+					</div>
+					<div class="feature-item">
+						<i class="fas fa-check-circle"></i>
+						<span>Preview and edit before downloading</span>
+					</div>
+				</div>
+
+				<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+					<button type="submit" class="btn btn-primary btn-lg">
+						<span
+							class="spinner-border spinner-border-sm"
+							role="status"
+							aria-hidden="true"
+							id="loadingSpinner"
+						></span>
+						<i class="fas fa-magic me-2"></i>Process Resume
+					</button>
+				</div>
+			</form>
+
+			<div class="alert alert-danger" role="alert" id="errorAlert">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				<span id="errorMessage">Error processing your resume.</span>
+			</div>
+
+			<div id="resultArea">
+				<h4><i class="fas fa-check-circle me-2"></i>Success!</h4>
+				<p>
+					Your resume has been processed. You can now preview and edit it below
+					before downloading.
+				</p>
+			</div>
+
+			<!-- Resume Preview Section -->
+			<div id="previewContainer" class="preview-container">
+				<div class="preview-header">
+					<h4>Resume Preview</h4>
+					<span class="badge bg-warning">Edit Mode</span>
+				</div>
+
+				<div class="editable-note">
+					<i class="fas fa-pencil-alt"></i>
+					<span
+						>You can edit any text by clicking on it. Click the Download button
+						when you're ready.</span
+					>
+				</div>
+
+				<div id="resumePreview">
+					<!-- Content will be dynamically populated -->
+					<div class="preview-contact">
+						<div class="name editable-container">
+							<span class="edit-label">Edit Name</span>
+							<div contenteditable="true" id="previewName"></div>
+						</div>
+						<div class="links">
+							<span class="editable-container">
+								<span class="edit-label">Edit Email</span>
+								<span contenteditable="true" id="previewEmail"></span>
+							</span>
+							||
+							<span class="editable-container">
+								<span class="edit-label">Edit Phone</span>
+								<span contenteditable="true" id="previewPhone"></span>
+							</span>
+							||
+							<span class="editable-container">
+								<span class="edit-label">Edit LinkedIn</span>
+								<span contenteditable="true" id="previewLinkedIn"></span>
+							</span>
+						</div>
+						<div class="title editable-container">
+							<span class="edit-label">Edit Title</span>
+							<div contenteditable="true" id="previewTitle"></div>
+						</div>
+					</div>
+
+					<div class="preview-section">
+						<h3>Professional Summary:</h3>
+						<div class="editable-container">
+							<span class="edit-label">Edit Summary</span>
+							<p contenteditable="true" id="previewSummary"></p>
+						</div>
+					</div>
+
+					<div class="preview-section">
+						<h3>Technical Skills:</h3>
+						<table class="skills-table" id="skillsTable">
+							<thead>
+								<tr>
+									<th>Category</th>
+									<th>Skills/Tools</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Skills will be populated here -->
+							</tbody>
+						</table>
+					</div>
+
+					<div class="preview-section">
+						<h3>Work Experience:</h3>
+						<div id="workExperience">
+							<!-- Work experience will be populated here -->
+						</div>
+					</div>
+
+					<div class="preview-section">
+						<h3>Education:</h3>
+						<div id="education">
+							<!-- Education will be populated here -->
+						</div>
+					</div>
+
+					<!-- Preview controls with PDF and DOCX download options -->
+					<div class="preview-controls">
+						<button class="btn btn-secondary" id="resetPreviewBtn">
+							<i class="fas fa-undo"></i> Reset to Original
+						</button>
+						<div class="btn-group">
+							<button class="btn btn-success" id="downloadDocxBtn">
+								<span
+									class="spinner-border spinner-border-sm"
+									id="downloadDocxSpinner"
+								></span>
+								<i class="fas fa-file-word"></i> Download DOCX
+							</button>
+							<button class="btn btn-danger" id="downloadPdfBtn">
+								<span
+									class="spinner-border spinner-border-sm"
+									id="downloadPdfSpinner"
+								></span>
+								<i class="fas fa-file-pdf"></i> Download PDF
+							</button>
+							<button class="btn btn-info" id="viewJsonBtn">
+								<i class="fas fa-code"></i> View Raw JSON
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tips">
+				<p>
+					<strong>Tip:</strong> For best results, make sure your resume has
+					clear section headings and consistent formatting.
+				</p>
+			</div>
+		</div>
+
+		<!-- JSON Modal Section -->
+		<div
+			class="modal fade"
+			id="jsonModal"
+			tabindex="-1"
+			aria-labelledby="jsonModalLabel"
+			aria-hidden="true"
+		>
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="jsonModalLabel">
+							Raw JSON Data from Gemini API
+						</h5>
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="modal"
+							aria-label="Close"
+						></button>
+					</div>
+					<div class="modal-body">
+						<div class="d-flex justify-content-end mb-2">
+							<button class="btn btn-sm btn-outline-secondary" id="copyJsonBtn">
+								<i class="fas fa-copy"></i> Copy to Clipboard
+							</button>
+						</div>
+						<pre
+							id="jsonContent"
+							class="bg-light p-3"
+							style="max-height: 500px; overflow-y: auto"
+						></pre>
+					</div>
+					<div class="modal-footer">
+						<button
+							type="button"
+							class="btn btn-secondary"
+							data-bs-dismiss="modal"
+						>
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- JavaScript for form submission and interactions -->
+		<script>
+			// Store the original parsed resume data
+			let originalResumeData = null;
+			let currentResumeData = null;
+
+			document
+				.getElementById("resumeForm")
+				.addEventListener("submit", function (e) {
+					e.preventDefault();
+
+					// Show loading spinner
+					document.getElementById("loadingSpinner").style.display =
+						"inline-block";
+
+					// Hide previous alerts/results
+					document.getElementById("errorAlert").style.display = "none";
+					document.getElementById("resultArea").style.display = "none";
+					document.getElementById("previewContainer").style.display = "none";
+
+					// Get form data
+					const resumeText = document.getElementById("resume").value;
+
+					// Submit form using fetch API
+					fetch("/submit", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/x-www-form-urlencoded",
+						},
+						body: "resume=" + encodeURIComponent(resumeText),
+					})
+						.then((response) => {
+							if (!response.ok) {
+								throw new Error("Failed to process resume. Please try again.");
+							}
+							return response.json();
+						})
+						.then((data) => {
+							// Store the original data
+							console.log("API response:", data);
+							originalResumeData = JSON.parse(JSON.stringify(data.data));
+							currentResumeData = JSON.parse(JSON.stringify(data.data));
+
+							// Store the skill category order
+							if (data.skill_order) {
+								originalResumeData.skill_order = data.skill_order;
+								currentResumeData.skill_order = data.skill_order;
+							}
+
+							// Hide spinner
+							document.getElementById("loadingSpinner").style.display = "none";
+
+							// Show success message
+							document.getElementById("resultArea").style.display = "block";
+
+							// Generate and show preview
+							generateEditablePreview(currentResumeData);
+
+							// Scroll to preview
+							document
+								.getElementById("previewContainer")
+								.scrollIntoView({ behavior: "smooth" });
+						})
+						.catch((error) => {
+							// Hide spinner
+							document.getElementById("loadingSpinner").style.display = "none";
+
+							// Show error
+							document.getElementById("errorAlert").style.display = "block";
+							document.getElementById("errorMessage").textContent =
+								error.message;
+						});
+				});
+
+			function generateEditablePreview(data) {
+				// Set contact information
+				document.getElementById("previewName").textContent = data.contact.name;
+				document.getElementById("previewEmail").textContent =
+					data.contact.email;
+				document.getElementById("previewPhone").textContent =
+					data.contact.phone;
+				document.getElementById("previewLinkedIn").textContent =
+					data.contact.linkedin;
+				document.getElementById("previewTitle").textContent = data.title;
+
+				// Set summary
+				document.getElementById("previewSummary").textContent = data.summary;
+
+				// Set technical skills
+				const skillsTableBody = document.querySelector("#skillsTable tbody");
+				skillsTableBody.innerHTML = "";
+
+				const skillOrder =
+					data.skill_order || Object.keys(data.technical_skills);
+
+				skillOrder.forEach((category) => {
+					const skills = data.technical_skills[category];
+					const row = document.createElement("tr");
+
+					const categoryCell = document.createElement("td");
+					categoryCell.className = "editable-container";
+
+					const categoryEditLabel = document.createElement("span");
+					categoryEditLabel.className = "edit-label";
+					categoryEditLabel.textContent = "Edit Category";
+					categoryCell.appendChild(categoryEditLabel);
+
+					const categoryEditable = document.createElement("div");
+					categoryEditable.contentEditable = true;
+					categoryEditable.className = "skill-category";
+					categoryEditable.textContent = category;
+					categoryEditable.dataset.originalCategory = category;
+					categoryCell.appendChild(categoryEditable);
+					row.appendChild(categoryCell);
+
+					const skillsCell = document.createElement("td");
+					skillsCell.className = "editable-container";
+
+					const skillsEditLabel = document.createElement("span");
+					skillsEditLabel.className = "edit-label";
+					skillsEditLabel.textContent = "Edit Skills";
+					skillsCell.appendChild(skillsEditLabel);
+
+					const skillsEditable = document.createElement("div");
+					skillsEditable.contentEditable = true;
+					skillsEditable.className = "skill-list";
+					skillsEditable.textContent = Array.isArray(skills)
+						? skills.join(", ")
+						: skills;
+					skillsCell.appendChild(skillsEditable);
+					row.appendChild(skillsCell);
+
+					skillsTableBody.appendChild(row);
+				});
+
+				// Set work experience
+				const workExperienceContainer =
+					document.getElementById("workExperience");
+				workExperienceContainer.innerHTML = "";
+
+				data.work_experience.forEach((job, jobIndex) => {
+					const jobDiv = document.createElement("div");
+					jobDiv.className = "job-entry";
+					jobDiv.dataset.index = jobIndex;
+
+					// Company and location
+					const companyRow = document.createElement("div");
+					companyRow.className = "company-role";
+
+					const companyDiv = document.createElement("div");
+					companyDiv.className = "company editable-container";
+
+					const companyEditLabel = document.createElement("span");
+					companyEditLabel.className = "edit-label";
+					companyEditLabel.textContent = "Edit Company";
+					companyDiv.appendChild(companyEditLabel);
+
+					const companyEditable = document.createElement("span");
+					companyEditable.contentEditable = true;
+					companyEditable.className = "job-company";
+					companyEditable.textContent = job.company;
+					companyDiv.appendChild(companyEditable);
+
+					const locationDiv = document.createElement("div");
+					locationDiv.className = "location editable-container";
+
+					const locationEditLabel = document.createElement("span");
+					locationEditLabel.className = "edit-label";
+					locationEditLabel.textContent = "Edit Location";
+					locationDiv.appendChild(locationEditLabel);
+
+					const locationEditable = document.createElement("span");
+					locationEditable.contentEditable = true;
+					locationEditable.className = "job-location";
+					locationEditable.textContent = job.location;
+					locationDiv.appendChild(locationEditable);
+
+					companyRow.appendChild(companyDiv);
+					companyRow.appendChild(locationDiv);
+					jobDiv.appendChild(companyRow);
+
+					// Role and dates
+					const roleRow = document.createElement("div");
+					roleRow.className = "company-role";
+
+					const roleDiv = document.createElement("div");
+					roleDiv.className = "role editable-container";
+
+					const roleEditLabel = document.createElement("span");
+					roleEditLabel.className = "edit-label";
+					roleEditLabel.textContent = "Edit Role";
+					roleDiv.appendChild(roleEditLabel);
+
+					const roleEditable = document.createElement("span");
+					roleEditable.contentEditable = true;
+					roleEditable.className = "job-role";
+					roleEditable.textContent = job.role;
+					roleDiv.appendChild(roleEditable);
+
+					const datesDiv = document.createElement("div");
+					datesDiv.className = "dates editable-container";
+
+					const datesEditLabel = document.createElement("span");
+					datesEditLabel.className = "edit-label";
+					datesEditLabel.textContent = "Edit Dates";
+					datesDiv.appendChild(datesEditLabel);
+
+					const datesEditable = document.createElement("span");
+					datesEditable.contentEditable = true;
+					datesEditable.className = "job-dates";
+					datesEditable.textContent = job.dates;
+					datesDiv.appendChild(datesEditable);
+
+					roleRow.appendChild(roleDiv);
+					roleRow.appendChild(datesDiv);
+					jobDiv.appendChild(roleRow);
+
+					// Achievements
+					const achievementsList = document.createElement("ul");
+					achievementsList.className = "achievements";
+					achievementsList.dataset.jobIndex = jobIndex;
+
+					job.achievements.forEach((achievement, achievementIndex) => {
+						const li = document.createElement("li");
+						li.className = "editable-container";
+						li.dataset.index = achievementIndex;
+
+						const achievementEditLabel = document.createElement("span");
+						achievementEditLabel.className = "edit-label";
+						achievementEditLabel.textContent = "Edit Achievement";
+						li.appendChild(achievementEditLabel);
+
+						const achievementEditable = document.createElement("span");
+						achievementEditable.contentEditable = true;
+						achievementEditable.className = "job-achievement";
+						achievementEditable.textContent = achievement
+							.replace("●", "")
+							.trim();
+						li.appendChild(achievementEditable);
+
+						const controlSpan = document.createElement("span");
+						controlSpan.style.marginLeft = "5px";
+
+						const deleteBtn = document.createElement("i");
+						deleteBtn.className = "fas fa-times delete-achievement-btn";
+						deleteBtn.title = "Delete achievement";
+						deleteBtn.onclick = function () {
+							li.remove();
+						};
+
+						controlSpan.appendChild(deleteBtn);
+						li.appendChild(controlSpan);
+
+						achievementsList.appendChild(li);
+					});
+
+					// Add achievement controls
+					const achievementControls = document.createElement("div");
+					achievementControls.className = "achievement-controls";
+
+					const addAchievementBtn = document.createElement("button");
+					addAchievementBtn.type = "button";
+					addAchievementBtn.className = "btn btn-sm btn-outline-primary";
+					addAchievementBtn.innerHTML =
+						'<i class="fas fa-plus"></i> Add Achievement';
+					addAchievementBtn.onclick = function () {
+						const newLi = document.createElement("li");
+						newLi.className = "editable-container";
+						newLi.dataset.index = "new";
+
+						const newEditLabel = document.createElement("span");
+						newEditLabel.className = "edit-label";
+						newEditLabel.textContent = "Edit Achievement";
+						newLi.appendChild(newEditLabel);
+
+						const newEditable = document.createElement("span");
+						newEditable.contentEditable = true;
+						newEditable.className = "job-achievement";
+						newEditable.textContent = "New achievement";
+						newLi.appendChild(newEditable);
+
+						const newControlSpan = document.createElement("span");
+						newControlSpan.style.marginLeft = "5px";
+
+						const newDeleteBtn = document.createElement("i");
+						newDeleteBtn.className = "fas fa-times delete-achievement-btn";
+						newDeleteBtn.title = "Delete achievement";
+						newDeleteBtn.onclick = function () {
+							newLi.remove();
+						};
+
+						newControlSpan.appendChild(newDeleteBtn);
+						newLi.appendChild(newControlSpan);
+
+						achievementsList.appendChild(newLi);
+						newEditable.focus();
+					};
+
+					achievementControls.appendChild(addAchievementBtn);
+
+					jobDiv.appendChild(achievementsList);
+					jobDiv.appendChild(achievementControls);
+					workExperienceContainer.appendChild(jobDiv);
+				});
+
+				// Set education
+				const educationContainer = document.getElementById("education");
+				const education = data.education;
+
+				const eduDiv = document.createElement("div");
+				eduDiv.className = "education-entry";
+
+				// Institution and location
+				const institutionRow = document.createElement("div");
+				institutionRow.className = "company-role";
+
+				const institutionDiv = document.createElement("div");
+				institutionDiv.className = "company editable-container";
+
+				const institutionEditLabel = document.createElement("span");
+				institutionEditLabel.className = "edit-label";
+				institutionEditLabel.textContent = "Edit Institution";
+				institutionDiv.appendChild(institutionEditLabel);
+
+				const institutionEditable = document.createElement("span");
+				institutionEditable.contentEditable = true;
+				institutionEditable.className = "education-institution";
+				institutionEditable.textContent = education.institution;
+				institutionDiv.appendChild(institutionEditable);
+
+				const eduLocationDiv = document.createElement("div");
+				eduLocationDiv.className = "location editable-container";
+
+				const eduLocationEditLabel = document.createElement("span");
+				eduLocationEditLabel.className = "edit-label";
+				eduLocationEditLabel.textContent = "Edit Location";
+				eduLocationDiv.appendChild(eduLocationEditLabel);
+
+				const eduLocationEditable = document.createElement("span");
+				eduLocationEditable.contentEditable = true;
+				eduLocationEditable.className = "education-location";
+				eduLocationEditable.textContent = education.location;
+				eduLocationDiv.appendChild(eduLocationEditable);
+
+				institutionRow.appendChild(institutionDiv);
+				institutionRow.appendChild(eduLocationDiv);
+				eduDiv.appendChild(institutionRow);
+
+				// Degree and graduation year
+				const degreeRow = document.createElement("div");
+				degreeRow.className = "company-role";
+
+				const degreeDiv = document.createElement("div");
+				degreeDiv.className = "role editable-container";
+
+				const degreeEditLabel = document.createElement("span");
+				degreeEditLabel.className = "edit-label";
+				degreeEditLabel.textContent = "Edit Degree";
+				degreeDiv.appendChild(degreeEditLabel);
+
+				const degreeEditable = document.createElement("span");
+				degreeEditable.contentEditable = true;
+				degreeEditable.className = "education-degree";
+				degreeEditable.textContent = education.degree;
+				degreeDiv.appendChild(degreeEditable);
+
+				const gradYearDiv = document.createElement("div");
+				gradYearDiv.className = "dates editable-container";
+
+				const gradYearEditLabel = document.createElement("span");
+				gradYearEditLabel.className = "edit-label";
+				gradYearEditLabel.textContent = "Edit Graduation Year";
+				gradYearDiv.appendChild(gradYearEditLabel);
+
+				const gradYearEditable = document.createElement("span");
+				gradYearEditable.contentEditable = true;
+				gradYearEditable.className = "education-graduation";
+				gradYearEditable.textContent = `Graduation: ${education.graduation_year}`;
+				gradYearDiv.appendChild(gradYearEditable);
+
+				degreeRow.appendChild(degreeDiv);
+				degreeRow.appendChild(gradYearDiv);
+				eduDiv.appendChild(degreeRow);
+
+				educationContainer.innerHTML = "";
+				educationContainer.appendChild(eduDiv);
+
+				// Show the preview container
+				document.getElementById("previewContainer").style.display = "block";
+
+				// Set up reset button
+				document.getElementById("resetPreviewBtn").onclick = function () {
+					if (confirm("Are you sure you want to reset all your changes?")) {
+						currentResumeData = JSON.parse(JSON.stringify(originalResumeData));
+						generateEditablePreview(currentResumeData);
+					}
+				};
+
+				// Set up download buttons
+				document.getElementById("downloadDocxBtn").onclick = function () {
+					collectChangesAndDownload("docx");
+				};
+				document.getElementById("downloadPdfBtn").onclick = function () {
+					collectChangesAndDownload("pdf");
+				};
+
+				// Set up view JSON button
+				document.getElementById("viewJsonBtn").onclick = function () {
+					const jsonModal = new bootstrap.Modal(
+						document.getElementById("jsonModal")
+					);
+					document.getElementById("jsonContent").textContent = JSON.stringify(
+						currentResumeData,
+						null,
+						2
+					);
+					jsonModal.show();
+				};
+
+				// Set up copy JSON button
+				document.getElementById("copyJsonBtn").onclick = function () {
+					const jsonContent =
+						document.getElementById("jsonContent").textContent;
+					navigator.clipboard
+						.writeText(jsonContent)
+						.then(() => {
+							alert("JSON data copied to clipboard!");
+						})
+						.catch((error) => {
+							alert("Failed to copy JSON data: " + error.message);
+						});
+				};
+			}
+
+			function collectChangesAndDownload(format) {
+				// Show loading spinner for the correct button
+				const spinnerId =
+					format === "docx" ? "downloadDocxSpinner" : "downloadPdfSpinner";
+				const buttonId =
+					format === "docx" ? "downloadDocxBtn" : "downloadPdfBtn";
+				document.getElementById(spinnerId).style.display = "inline-block";
+				const downloadBtn = document.getElementById(buttonId);
+				downloadBtn.disabled = true;
+
+				// Collect contact information changes
+				currentResumeData.contact.name =
+					document.getElementById("previewName").textContent;
+				currentResumeData.contact.email =
+					document.getElementById("previewEmail").textContent;
+				currentResumeData.contact.phone =
+					document.getElementById("previewPhone").textContent;
+				currentResumeData.contact.linkedin =
+					document.getElementById("previewLinkedIn").textContent;
+				currentResumeData.title =
+					document.getElementById("previewTitle").textContent;
+
+				// Collect summary changes
+				currentResumeData.summary =
+					document.getElementById("previewSummary").textContent;
+
+				// Collect technical skills changes - preserve exact order
+				const updatedSkills = {};
+				const skillRows = document.querySelectorAll("#skillsTable tbody tr");
+
+				skillRows.forEach((row) => {
+					const category = row.querySelector(".skill-category").textContent;
+					const skillsText = row.querySelector(".skill-list").textContent;
+					const skillsArray = skillsText
+						.split(",")
+						.map((skill) => skill.trim())
+						.filter((skill) => skill);
+
+					// Use the category name as is
+					updatedSkills[category] = skillsArray;
+				});
+
+				currentResumeData.technical_skills = updatedSkills;
+
+				// Collect work experience changes
+				const updatedWorkExperience = [];
+				const jobEntries = document.querySelectorAll(".job-entry");
+
+				jobEntries.forEach((jobEntry) => {
+					const company = jobEntry.querySelector(".job-company").textContent;
+					const location = jobEntry.querySelector(".job-location").textContent;
+					const role = jobEntry.querySelector(".job-role").textContent;
+					// Normalize dashes for consistent display
+					const dates = jobEntry
+						.querySelector(".job-dates")
+						.textContent.replace("\u00e2", "-")
+						.replace("\u2013", "-")
+						.replace("\u2014", "-");
+
+					const achievements = [];
+					jobEntry
+						.querySelectorAll(".job-achievement")
+						.forEach((achievement) => {
+							achievements.push("● " + achievement.textContent.trim());
+						});
+
+					updatedWorkExperience.push({
+						company: company,
+						location: location,
+						role: role,
+						dates: dates,
+						achievements: achievements,
+					});
+				});
+
+				currentResumeData.work_experience = updatedWorkExperience;
+
+				// Collect education changes
+				const educationEntry = document.querySelector(".education-entry");
+				const institution = educationEntry.querySelector(
+					".education-institution"
+				).textContent;
+				const eduLocation = educationEntry.querySelector(
+					".education-location"
+				).textContent;
+				const degree =
+					educationEntry.querySelector(".education-degree").textContent;
+				let gradYear = educationEntry.querySelector(
+					".education-graduation"
+				).textContent;
+
+				// Extract just the year from "Graduation: YYYY"
+				if (gradYear.includes(":")) {
+					gradYear = gradYear.split(":")[1].trim();
+				}
+
+				currentResumeData.education = {
+					institution: institution,
+					location: eduLocation,
+					degree: degree,
+					graduation_year: gradYear,
+				};
+
+				// Determine which endpoint to call based on format
+				const endpoint = format === "pdf" ? "/generate/pdf" : "/generate";
+
+				// Send updated data to backend for document generation
+				fetch(endpoint, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(currentResumeData),
+				})
+					.then((response) => {
+						if (!response.ok) {
+							throw new Error(
+								`Failed to generate ${format.toUpperCase()} document. Please try again.`
+							);
+						}
+
+						// For blob response handling
+						return response.blob();
+					})
+					.then((blob) => {
+						// Create a link element to trigger download
+						const url = window.URL.createObjectURL(blob);
+						const a = document.createElement("a");
+
+						// Generate a filename based on user's name
+						const cleanName = currentResumeData.contact.name
+							.replace(/[^\w\s]/gi, "")
+							.replace(/\s+/g, "_");
+						const filename = `${cleanName}_Resume.${format}`;
+
+						a.href = url;
+						a.download = filename;
+
+						// Append to the document, click, and remove
+						document.body.appendChild(a);
+						a.click();
+						window.URL.revokeObjectURL(url);
+						a.remove();
+
+						// Hide spinner and enable button
+						document.getElementById(spinnerId).style.display = "none";
+						downloadBtn.disabled = false;
+					})
+					.catch((error) => {
+						// Hide spinner and enable button
+						document.getElementById(spinnerId).style.display = "none";
+						downloadBtn.disabled = false;
+
+						// Show error
+						alert("Error generating document: " + error.message);
+					});
+			}
+		</script>
+
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	</body>
+</html>
