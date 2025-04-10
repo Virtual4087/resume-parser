@@ -3,3 +3,5 @@ requests
 python_docx
 flask
 docx2pdf
+python-dotenv
+PyPDF2

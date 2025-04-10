@@ -1,12 +1,16 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
     """Base configuration class"""
     # API Key for Google Gemini API
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', "AIzaSyDquJr4Ph35GmvfNeKihNxGVMurky_NYqU")
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     
     # Flask settings
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-for-resume-parser')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key-please-change-in-production')
     DEBUG = False
     TESTING = False
     
@@ -25,10 +29,7 @@ class TestingConfig(Config):
     
 class ProductionConfig(Config):
     """Production configuration"""
-    # Use real environment variables in production
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    # In production, this should be set as an environment variable
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+    DEBUG = False
 
 # Configuration dictionary to easily select the right configuration
 config_by_name = {
